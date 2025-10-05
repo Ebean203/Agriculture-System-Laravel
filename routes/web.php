@@ -45,8 +45,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/ncfrs', function () { return view('coming-soon', ['pageTitle' => 'NCFRS Records']); })->name('ncfrs');
     Route::get('/fishr', function () { return view('coming-soon', ['pageTitle' => 'FishR Records']); })->name('fishr');
     Route::get('/boats', function () { return view('coming-soon', ['pageTitle' => 'Boat Records']); })->name('boats');
-    
-    Route::get('/inventory', function () { return view('coming-soon', ['pageTitle' => 'Manage Inventory']); })->name('inventory.index');
+    // Inventory Routes
+    Route::get('/inventory', [App\Http\Controllers\InventoryController::class, 'index'])->name('inventory');
+    Route::post('/inventory/add-stock', [App\Http\Controllers\InventoryController::class, 'addStock'])->name('inventory.add-stock');
+    Route::post('/inventory/update-stock', [App\Http\Controllers\InventoryController::class, 'updateStock'])->name('inventory.update-stock');
+    Route::post('/inventory/distribute', [App\Http\Controllers\InventoryController::class, 'distribute'])->name('inventory.distribute');
+    Route::post('/inventory/add-new-input', [App\Http\Controllers\InventoryController::class, 'addNewInput'])->name('inventory.add-new-input');
+    Route::get('/inventory/farmers', [App\Http\Controllers\InventoryController::class, 'getFarmers'])->name('inventory.farmers');
     Route::get('/distributions', function () { return view('coming-soon', ['pageTitle' => 'Distribution Records']); })->name('distributions');
     Route::get('/activities', function () { return view('coming-soon', ['pageTitle' => 'MAO Activities']); })->name('activities');
     Route::get('/yield-monitoring', function () { return view('coming-soon', ['pageTitle' => 'Yield Monitoring']); })->name('yield-monitoring');

@@ -33,7 +33,7 @@ $current = basename(request()->path()) ?: 'dashboard';
         </a>
         
         <div class="sidebar__section" style="font-size:11.5px;padding:8px 12px 5px;">Operations</div>
-        <a href="{{ route('inventory') }}" class="sidebar__link {{ $current === 'inventory' ? 'is-active' : '' }}" style="padding:9px 13px;font-size:16px;">
+        <a href="/inventory" class="sidebar__link {{ $current === 'inventory' ? 'is-active' : '' }}" style="padding:9px 13px;font-size:16px;">
             <i class="fas fa-warehouse"></i><span>Inventory</span>
         </a>
         <a href="{{ route('distributions') }}" class="sidebar__link {{ $current === 'distributions' ? 'is-active' : '' }}" style="padding:9px 13px;font-size:16px;">

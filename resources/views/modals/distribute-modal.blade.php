@@ -12,7 +12,7 @@
                 </p>
             </div>
             <div class="items-center px-4 py-3">
-                <button onclick="window.location.href='{{ route('inventory') }}'" class="px-4 py-2 bg-blue-600 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button onclick="window.location.href='/inventory'" class="px-4 py-2 bg-blue-600 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <i class="fas fa-arrow-right mr-2"></i>Go to Inventory Page
                 </button>
                 <button onclick="closeModal('distributeModal')" class="mt-3 px-4 py-2 bg-gray-100 text-gray-700 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300">

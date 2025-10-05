@@ -284,9 +284,9 @@ function navigateToNotificationPage(category, itemName, inputId, farmerName, far
     switch(category) {
         case 'inventory':
             if (inputId && inputId !== '') {
-                window.location.href = '{{ route('inventory') }}?highlight=' + inputId + '&item=' + encodeURIComponent(itemName);
+                                        window.location.href = '/inventory?highlight=' + inputId + '&item=' + encodeURIComponent(itemName);
             } else {
-                window.location.href = '{{ route('inventory') }}?search=' + encodeURIComponent(itemName);
+                                        window.location.href = '/inventory?search=' + encodeURIComponent(itemName);
             }
             break;
         case 'visitation':
