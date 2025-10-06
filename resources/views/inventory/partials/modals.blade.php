@@ -75,7 +75,7 @@
             </h3>
             <p class="text-sm text-gray-600 mt-1">Manage input distribution and tracking</p>
         </div>
-        <form id="distributeForm">
+        <form id="distributeForm" action="{{ route('inventory.distribute') }}" method="POST">
             @csrf
             <div class="px-6 py-6">
                 <!-- Hidden input for selected input ID -->
@@ -94,65 +94,48 @@
                     </div>
                 </div>
                 
-                <!-- Main form content -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Left Column: Distribution Details -->
-                    <div>
-                        <h5 class="text-lg font-medium text-gray-900 mb-4">Distribution Details</h5>
+                <!-- Main form content (Legacy-aligned: only Farmer, Quantity, Date) -->
+                <div>
+                    <h5 class="text-lg font-medium text-gray-900 mb-4">Distribution Details</h5>
+                    
+                    <!-- Farmer Selection -->
+                    <div class="mb-4 relative">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Select Farmer <span class="text-red-500">*</span></label>
+                        <input type="text" 
+                               id="farmer_name" 
+                               placeholder="Type farmer name to search..." 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" 
+                               autocomplete="off" 
+                               oninput="searchFarmers(this.value)" 
+                               onfocus="showSuggestions()" 
+                               onblur="hideSuggestions()">
+                        <input type="hidden" id="selected_farmer_id" name="farmer_id">
                         
-                        <!-- Farmer Selection -->
-                        <div class="mb-4 relative">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Farmer <span class="text-red-500">*</span></label>
-                            <input type="text" 
-                                   id="farmer_name" 
-                                   placeholder="Type farmer name to search..." 
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" 
-                                   autocomplete="off" 
-                                   oninput="searchFarmers(this.value)" 
-                                   onfocus="showSuggestions()" 
-                                   onblur="hideSuggestions()">
-                            <input type="hidden" id="selected_farmer_id" name="farmer_id">
-                            
-                            <div id="farmer_suggestions" class="absolute z-20 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg hidden">
-                                <!-- Farmer suggestions will be populated here -->
-                            </div>
-                        </div>
-                        
-                        <!-- Quantity -->
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Quantity to Distribute <span class="text-red-500">*</span></label>
-                            <input type="number" 
-                                   name="quantity_distributed" 
-                                   id="quantity_distributed" 
-                                   min="1" 
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" 
-                                   required>
-                        </div>
-                        
-                        <!-- Date Given -->
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Date Given <span class="text-red-500">*</span></label>
-                            <input type="date" 
-                                   name="date_given" 
-                                   id="date_given" 
-                                   value="{{ date('Y-m-d') }}" 
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" 
-                                   required>
+                        <div id="farmer_suggestions" class="absolute z-20 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg hidden">
+                            <!-- Farmer suggestions will be populated here -->
                         </div>
                     </div>
                     
-                    <!-- Right Column: Additional Information -->
-                    <div>
-                        <h5 class="text-lg font-medium text-gray-900 mb-4">Additional Information</h5>
-                        
-                        <!-- Notes -->
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
-                            <textarea name="notes" 
-                                      rows="3" 
-                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" 
-                                      placeholder="Any additional notes about this distribution..."></textarea>
-                        </div>
+                    <!-- Quantity -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Quantity to Distribute <span class="text-red-500">*</span></label>
+                        <input type="number" 
+                               name="quantity_distributed" 
+                               id="quantity_distributed" 
+                               min="1" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" 
+                               required>
+                    </div>
+                    
+                    <!-- Date Given -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Date Given <span class="text-red-500">*</span></label>
+                        <input type="date" 
+                               name="date_given" 
+                               id="date_given" 
+                               value="{{ date('Y-m-d') }}" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" 
+                               required>
                     </div>
                 </div>
                 
@@ -283,7 +266,7 @@
             <h3 class="text-lg font-medium text-gray-900">Add New Commodity</h3>
             <p class="text-sm text-gray-600 mt-1">Create a new agricultural commodity type</p>
         </div>
-        <form id="addNewCommodityForm">
+        <form id="addNewCommodityForm" action="{{ route('inventory.add-commodity') }}" method="POST">
             @csrf
             <div class="p-6">
                 <div class="mb-4">
@@ -295,10 +278,9 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
                     <select name="category_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
                         <option value="">Select Category</option>
-                        <option value="1">Crops</option>
-                        <option value="2">Livestock</option>
-                        <option value="3">Fisheries</option>
-                        <option value="4">Others</option>
+                        @foreach(($categories ?? []) as $cat)
+                            <option value="{{ $cat->category_id }}">{{ $cat->category_name }}</option>
+                        @endforeach
                     </select>
                 </div>
                 

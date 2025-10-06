@@ -7,6 +7,8 @@ use App\Models\InputCategory;
 use App\Models\MaoInventory;
 use App\Models\MaoDistributionLog;
 use App\Models\Farmer;
+use App\Models\Commodity;
+use App\Models\CommodityCategory;
 use Illuminate\Support\Facades\DB;
 
 class InventoryController extends Controller
@@ -79,9 +81,12 @@ class InventoryController extends Controller
         // Get last updated date
         $last_updated = $inputs->whereNotNull('last_updated')->max('last_updated');
 
+        // Load commodity categories for modal dropdown
+        $categories = \App\Models\CommodityCategory::orderBy('category_name')->get();
+
         return view('inventory.index', compact(
             'inputs', 'distributions', 'urgent_items', 'warning_items', 'normal_items',
-            'total_items', 'out_of_stock', 'low_stock', 'last_updated', 'notification_lookup'
+            'total_items', 'out_of_stock', 'low_stock', 'last_updated', 'notification_lookup', 'categories'
         ));
     }
 
@@ -154,7 +159,7 @@ class InventoryController extends Controller
             'farmer_id' => 'required|exists:farmers,farmer_id',
             'quantity_distributed' => 'required|integer|min:1',
             'date_given' => 'required|date',
-            'visitation_date' => 'nullable|date|after_or_equal:date_given'
+            'visitation_date' => 'required|date|after_or_equal:date_given'
         ]);
 
         DB::beginTransaction();
@@ -165,15 +170,13 @@ class InventoryController extends Controller
                 return response()->json(['success' => false, 'message' => 'Insufficient stock available']);
             }
 
-            // Create distribution record
+            // Create distribution record (DB columns: farmer_id, input_id, quantity_distributed, date_given, visitation_date)
             MaoDistributionLog::create([
                 'input_id' => $request->input_id,
                 'farmer_id' => $request->farmer_id,
                 'quantity_distributed' => $request->quantity_distributed,
                 'date_given' => $request->date_given,
                 'visitation_date' => $request->visitation_date,
-                'distributed_by' => auth()->user()->staff_id ?? session('user_id'),
-                'distribution_date' => now()
             ]);
 
             // Update inventory
@@ -229,6 +232,25 @@ class InventoryController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(['success' => false, 'message' => 'Error adding new input type: ' . $e->getMessage()]);
+        }
+    }
+
+    public function addNewCommodity(Request $request)
+    {
+        $request->validate([
+            'commodity_name' => 'required|string|max:100',
+            'category_id' => 'required|exists:commodity_categories,category_id',
+        ]);
+
+        try {
+            $commodity = Commodity::create([
+                'commodity_name' => $request->commodity_name,
+                'category_id' => $request->category_id,
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'New commodity added successfully', 'commodity' => $commodity]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error adding commodity: ' . $e->getMessage()], 500);
         }
     }
 

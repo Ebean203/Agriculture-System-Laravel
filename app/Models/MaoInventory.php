@@ -11,10 +11,8 @@ class MaoInventory extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'item_name',
-        'item_type',
+        'input_id',
         'quantity_on_hand',
-        'unit',
         'last_updated'
     ];
 }

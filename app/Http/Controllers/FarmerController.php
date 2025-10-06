@@ -67,23 +67,25 @@ class FarmerController extends Controller
      */
     public function store(Request $request)
     {
-        // Validation rules
+        // Validation rules (align with DB NOT NULL columns and form requirements)
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:100',
+            'middle_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
+            'suffix' => 'required|string|max:10',
             'birth_date' => 'required|date',
             'gender' => 'required|in:Male,Female',
-            'contact_number' => 'nullable|string|max:20',
+            'contact_number' => 'required|string|max:20',
             'barangay_id' => 'required|exists:barangays,barangay_id',
-            'address_details' => 'nullable|string|max:255',
+            'address_details' => 'required|string|max:255',
             'is_member_of_4ps' => 'nullable|boolean',
             'is_ip' => 'nullable|boolean',
-            'other_income_source' => 'nullable|string|max:255',
-            'civil_status' => 'nullable|string|max:50',
+            'other_income_source' => 'required|string|max:255',
+            'civil_status' => 'required|string|max:50',
             'spouse_name' => 'nullable|string|max:200',
-            'household_size' => 'nullable|integer|min:1',
-            'education_level' => 'nullable|string|max:100',
-            'occupation' => 'nullable|string|max:100',
+            'household_size' => 'required|integer|min:1',
+            'education_level' => 'required|string|max:100',
+            'occupation' => 'required|string|max:100',
             'commodities' => 'required|array|min:1',
             'commodities.*.commodity_id' => 'required|exists:commodities,commodity_id',
             'commodities.*.years_farming' => 'nullable|integer|min:0',
@@ -96,10 +98,14 @@ class FarmerController extends Controller
 
         DB::beginTransaction();
         try {
-            // Generate unique farmer ID
-            $lastFarmer = Farmer::orderBy('id', 'desc')->first();
-            $nextId = $lastFarmer ? $lastFarmer->id + 1 : 1;
-            $farmerId = 'FRM-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
+            // Generate unique farmer ID based on max numeric suffix of existing IDs
+            // Assumes IDs follow the pattern "FRM-000001"
+            $maxNum = DB::table('farmers')
+                ->where('farmer_id', 'like', 'FRM-%')
+                ->selectRaw('MAX(CAST(SUBSTRING(farmer_id, 5) AS UNSIGNED)) as max_num')
+                ->value('max_num');
+            $nextNum = ((int) ($maxNum ?? 0)) + 1;
+            $farmerId = 'FRM-' . str_pad((string) $nextNum, 6, '0', STR_PAD_LEFT);
 
             // Create farmer
             $farmer = Farmer::create([
@@ -125,16 +131,14 @@ class FarmerController extends Controller
                 'registration_date' => now(),
             ]);
 
-            // Create household info if provided
-            if ($request->filled('civil_status')) {
-                $farmer->householdInfo()->create([
-                    'civil_status' => $request->civil_status,
-                    'spouse_name' => $request->spouse_name,
-                    'household_size' => $request->household_size,
-                    'education_level' => $request->education_level,
-                    'occupation' => $request->occupation,
-                ]);
-            }
+            // Create household info (required by validation); ensure NOT NULL fields have safe defaults
+            $farmer->householdInfo()->create([
+                'civil_status' => $request->civil_status,
+                'spouse_name' => $request->civil_status === 'Married' ? ($request->spouse_name ?? '') : '',
+                'household_size' => $request->household_size ?? 1,
+                'education_level' => $request->education_level ?? 'Not Specified',
+                'occupation' => $request->occupation ?? 'Farmer',
+            ]);
 
             // Attach commodities with primary flag
             $primaryIndex = $request->input('primary_commodity_index', 0);
@@ -659,7 +663,7 @@ class FarmerController extends Controller
             ]);
         }
 
-        $farmers = Farmer::where('archived', 0)
+        $farmersQuery = Farmer::where('archived', 0)
             ->where(function($q) use ($query) {
                 // Prioritize names that START with the query
                 $q->where('first_name', 'LIKE', "{$query}%")
@@ -669,7 +673,18 @@ class FarmerController extends Controller
                   ->orWhere('farmer_id', 'LIKE', "%{$query}%")
                   ->orWhere('contact_number', 'LIKE', "%{$query}%");
             })
-            ->with('barangay')
+            ->with('barangay');
+
+        // Optional filters to reuse this endpoint across pages
+        $filterType = $request->get('filter_type');
+        $program = $request->get('program');
+        $isFishr = $request->boolean('is_fishr');
+
+        if ($isFishr || $program === 'fisherfolk' || $filterType === 'fisherfolk') {
+            $farmersQuery->where('is_fisherfolk', 1);
+        }
+
+        $farmers = $farmersQuery
             ->orderByRaw("CASE 
                 WHEN first_name LIKE ? THEN 1
                 WHEN last_name LIKE ? THEN 2

@@ -281,7 +281,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const formData = new FormData(distributeForm);
             
-            fetch('/inventory/distribute', {
+            const action = distributeForm.getAttribute('action') || '/inventory/distribute';
+            fetch(action, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -293,14 +294,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     showSuccessMessage(data.message);
                     closeModal('distributeModal');
-                    location.reload();
+                    setTimeout(() => { location.reload(); }, 2000);
                 } else {
                     showErrorMessage(data.message);
+                    setTimeout(() => { location.reload(); }, 2000);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 showErrorMessage('Error distributing input');
+                setTimeout(() => { location.reload(); }, 2000);
             });
         });
     }
@@ -365,6 +368,41 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error:', error);
                 showErrorMessage('Error adding stock');
+            });
+        });
+    }
+
+    // Add New Commodity Form
+    const addNewCommodityForm = document.getElementById('addNewCommodityForm');
+    if (addNewCommodityForm) {
+        addNewCommodityForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(addNewCommodityForm);
+            const action = addNewCommodityForm.getAttribute('action') || '/inventory/add-commodity';
+
+            fetch(action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccessMessage(data.message || 'Commodity added successfully');
+                    closeAddNewCommodityModal();
+                    setTimeout(() => { location.reload(); }, 2000);
+                } else {
+                    showErrorMessage(data.message || 'Failed to add commodity');
+                    setTimeout(() => { location.reload(); }, 2000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorMessage('Error adding commodity');
+                setTimeout(() => { location.reload(); }, 2000);
             });
         });
     }

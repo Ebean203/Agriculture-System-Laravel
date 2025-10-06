@@ -1,5 +1,7 @@
 <?php
-$current = basename(request()->path()) ?: 'dashboard';
+$path = trim(request()->path(), '/');
+$segments = explode('/', $path);
+$current = $segments[0] ?: 'dashboard';
 ?>
 <aside id="appSidebar" class="sidebar bg-agri-green text-white shadow-lg" style="height:100vh;overflow:hidden;">
     <div class="sidebar__brand">
@@ -45,7 +47,7 @@ $current = basename(request()->path()) ?: 'dashboard';
         <a href="{{ route('yield-monitoring') }}" class="sidebar__link {{ $current === 'yield-monitoring' ? 'is-active' : '' }}" style="padding:9px 13px;font-size:16px;">
             <i class="fas fa-chart-line"></i><span>Yield Monitoring</span>
         </a>
-        <a href="{{ route('reports') }}" class="sidebar__link {{ $current === 'reports' ? 'is-active' : '' }}" style="padding:9px 13px;font-size:16px;">
+        <a href="{{ route('reports.index') }}" class="sidebar__link {{ $current === 'reports' ? 'is-active' : '' }}" style="padding:9px 13px;font-size:16px;">
             <i class="fas fa-file-alt"></i><span>Reports</span>
         </a>
         

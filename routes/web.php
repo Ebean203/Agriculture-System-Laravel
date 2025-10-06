@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\FarmerController;
 use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 // Login routes (NO authentication required)
@@ -41,22 +42,38 @@ Route::middleware('auth')->group(function () {
     Route::post('/farmers/{id}/archive', [FarmerController::class, 'archive'])->name('farmers.archive');
     Route::get('/api/farmers/search', [FarmerController::class, 'search'])->name('farmers.search');
     
-    Route::get('/rsbsa', function () { return view('coming-soon', ['pageTitle' => 'RSBSA Records']); })->name('rsbsa');
-    Route::get('/ncfrs', function () { return view('coming-soon', ['pageTitle' => 'NCFRS Records']); })->name('ncfrs');
-    Route::get('/fishr', function () { return view('coming-soon', ['pageTitle' => 'FishR Records']); })->name('fishr');
-    Route::get('/boats', function () { return view('coming-soon', ['pageTitle' => 'Boat Records']); })->name('boats');
+    Route::get('/rsbsa', [App\Http\Controllers\RsbsaController::class, 'index'])->name('rsbsa');
+    Route::get('/ncfrs', [App\Http\Controllers\NcfrsController::class, 'index'])->name('ncfrs');
+    Route::get('/fishr', [App\Http\Controllers\FishrController::class, 'index'])->name('fishr');
+    Route::get('/boats', [App\Http\Controllers\BoatsController::class, 'index'])->name('boats');
     // Inventory Routes
     Route::get('/inventory', [App\Http\Controllers\InventoryController::class, 'index'])->name('inventory');
     Route::post('/inventory/add-stock', [App\Http\Controllers\InventoryController::class, 'addStock'])->name('inventory.add-stock');
     Route::post('/inventory/update-stock', [App\Http\Controllers\InventoryController::class, 'updateStock'])->name('inventory.update-stock');
     Route::post('/inventory/distribute', [App\Http\Controllers\InventoryController::class, 'distribute'])->name('inventory.distribute');
     Route::post('/inventory/add-new-input', [App\Http\Controllers\InventoryController::class, 'addNewInput'])->name('inventory.add-new-input');
+    Route::post('/inventory/add-commodity', [App\Http\Controllers\InventoryController::class, 'addNewCommodity'])->name('inventory.add-commodity');
     Route::get('/inventory/farmers', [App\Http\Controllers\InventoryController::class, 'getFarmers'])->name('inventory.farmers');
-    Route::get('/distributions', function () { return view('coming-soon', ['pageTitle' => 'Distribution Records']); })->name('distributions');
-    Route::get('/activities', function () { return view('coming-soon', ['pageTitle' => 'MAO Activities']); })->name('activities');
-    Route::get('/yield-monitoring', function () { return view('coming-soon', ['pageTitle' => 'Yield Monitoring']); })->name('yield-monitoring');
-    Route::get('/reports', function () { return view('coming-soon', ['pageTitle' => 'Reports']); })->name('reports');
-    Route::get('/staff', function () { return view('coming-soon', ['pageTitle' => 'Staff Management']); })->name('staff.index');
+    Route::get('/distributions', [App\Http\Controllers\DistributionsController::class, 'index'])->name('distributions');
+    // Activities (MAO) Routes
+    Route::get('/activities', [App\Http\Controllers\ActivitiesController::class, 'index'])->name('activities');
+    Route::post('/activities', [App\Http\Controllers\ActivitiesController::class, 'store'])->name('activities.store');
+    Route::put('/activities/{id}', [App\Http\Controllers\ActivitiesController::class, 'update'])->name('activities.update');
+    // All System Activities (legacy all_activities.php equivalent)
+    Route::get('/activities/all', [App\Http\Controllers\ActivityLogController::class, 'index'])->name('activities.all');
+    // Yield Monitoring Routes
+    Route::get('/yield-monitoring', [App\Http\Controllers\YieldMonitoringController::class, 'index'])->name('yield-monitoring');
+    Route::post('/yield-monitoring', [App\Http\Controllers\YieldMonitoringController::class, 'store'])->name('yield.store');
+    
+    // Reports Routes
+    Route::get('/reports/index', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/all', [ReportController::class, 'allReports'])->name('reports.all');
+    Route::post('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');
+    Route::get('/reports/saved', [ReportController::class, 'getSavedReports'])->name('reports.saved');
+    Route::get('/reports/count', [ReportController::class, 'getSavedReportsCount'])->name('reports.count');
+    
+    Route::get('/staff', [App\Http\Controllers\StaffController::class, 'index'])->name('staff.index');
+    Route::post('/staff', [App\Http\Controllers\StaffController::class, 'store'])->name('staff.store');
 });
 
 Route::middleware('auth')->group(function () {

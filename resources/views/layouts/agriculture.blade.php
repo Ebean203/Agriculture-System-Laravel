@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $pageTitle ?? 'Lagonglong FARMS' }}</title>
     <x-agriculture-assets />
     @stack('additional-css')
@@ -82,6 +83,17 @@
         </div>
     </div>
     
+    @if(session('success') || ($errors ?? null) && $errors->any())
+    <script>
+        // Auto-refresh the page after showing success or error messages
+        (function(){
+            setTimeout(function(){
+                window.location.reload();
+            }, 2000);
+        })();
+    </script>
+    @endif
+
     @stack('additional-js')
 </body>
 </html>

@@ -668,8 +668,7 @@ document.addEventListener('click', function(event) {
 </script>
 @endpush
 
-<!-- Farmer Registration Modal -->
-@include('modals.farmer-modal')
+<!-- Farmer Registration Modal included above to avoid duplicate scripts -->
 
 <!-- Farmer View Modal -->
 @include('modals.farmer-view-modal')

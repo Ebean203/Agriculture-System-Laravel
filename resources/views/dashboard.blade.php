@@ -123,7 +123,7 @@
                         <i class="fas fa-clipboard-list text-white text-2xl mr-3"></i>
                         <span class="font-medium text-base leading-tight">Record Yield</span>
                     </button>
-                    <button onclick="navigateTo('{{ route('activities') }}')" class="w-full flex items-center p-4 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 transition-all duration-300">
+                    <button onclick="navigateTo('{{ route('activities.all') }}')" class="w-full flex items-center p-4 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 transition-all duration-300">
                         <i class="fas fa-list-alt text-white text-2xl mr-3"></i>
                         <span class="font-medium text-base leading-tight">All Activities</span>
                     </button>

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class HouseholdInfo extends Model
 {
     protected $table = 'household_info';
+    public $timestamps = false;
 
     protected $fillable = [
         'farmer_id',

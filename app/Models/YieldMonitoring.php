@@ -13,6 +13,7 @@ class YieldMonitoring extends Model
     protected $fillable = [
         'farmer_id',
         'commodity_id',
+        'season',
         'record_date',
         'yield_amount',
         'unit'

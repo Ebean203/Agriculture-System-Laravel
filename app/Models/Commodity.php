@@ -11,7 +11,7 @@ class Commodity extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'commodity_name',
-        'commodity_type'
+        'category_id',
+        'commodity_name'
     ];
 }
