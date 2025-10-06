@@ -27,7 +27,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/notifications', [NotificationController::class, 'getNotifications'])->name('api.notifications');
 
     // Analytics Routes
-    Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+    // Redirect to legacy analytics dashboard (procedural PHP page)
+    Route::get('/analytics', function () {
+        $legacyUrl = env('LEGACY_ANALYTICS_URL', 'http://localhost/agriculture-system/analytics_dashboard.php');
+        return redirect()->away($legacyUrl);
+    })->name('analytics.index');
 
     // Placeholder routes for sidebar navigation (will be implemented in next steps)
     
