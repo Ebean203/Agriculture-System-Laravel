@@ -709,3 +709,54 @@ tests/
 
 vendor/ (Composer packages)
 ```
+
+## AJAX and jQuery usage map
+
+This section lists exactly where jQuery is loaded and where AJAX (via jQuery, Fetch API, or axios) is used in the project.
+
+- Where jQuery is included
+  - `resources/views/components/agriculture-assets.blade.php` (local and CDN jQuery includes)
+  - `resources/views/auth/login-agriculture.blade.php` (local jQuery include)
+  - `resources/views/layouts/agriculture.blade.php` (uses `<x-agriculture-assets />` which includes jQuery)
+  - `public/agriculture-assets/js/jquery.min.js` (local asset)
+  - `public/js/jquery.min.js` (legacy/duplicate copy)
+  - `Agriculture-System/includes/assets.php` (legacy include echoes jQuery)
+  - `Agriculture-System/assets/js/jquery.min.js` (legacy asset)
+
+- Laravel views using $.ajax
+  - `resources/views/reports/index.blade.php`
+
+- Laravel views using Fetch API
+  - `resources/views/components/navigation.blade.php`
+  - `resources/views/dashboard.blade.php`
+  - `resources/views/farmers/index.blade.php`
+  - `resources/views/fishr/index.blade.php`
+  - `resources/views/ncfrs/index.blade.php`
+  - `resources/views/rsbsa/index.blade.php`
+  - `resources/views/yield/monitoring.blade.php`
+  - `resources/views/inventory/partials/javascript.blade.php`
+  - `resources/views/modals/geo-tagging-modal.blade.php`
+
+- App JS configuring axios
+  - `resources/js/bootstrap.js` (sets `window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';`)
+
+- Legacy Agriculture-System using $.ajax
+  - `Agriculture-System/reports.php`
+
+- Legacy Agriculture-System using Fetch API
+  - `Agriculture-System/analytics_dashboard.php`
+  - `Agriculture-System/index.php`
+  - `Agriculture-System/boat_records.php`
+  - `Agriculture-System/farmers.php`
+  - `Agriculture-System/farmer_editmodal.php`
+  - `Agriculture-System/fishr_records.php`
+  - `Agriculture-System/geotagging_modal.php`
+  - `Agriculture-System/includes/notification_complete.php`
+  - `Agriculture-System/mao_inventory.php`
+  - `Agriculture-System/ncfrs_records.php`
+  - `Agriculture-System/rsbsa_records.php`
+  - `Agriculture-System/yield_monitoring.php`
+
+Notes:
+- Some legacy pages are being migrated to Laravel MVC; their AJAX may be refactored to use route helpers and controllers.
+- If you standardize on Fetch or axios, update the above files accordingly and ensure CSRF headers are set for POST/PUT/DELETE.
