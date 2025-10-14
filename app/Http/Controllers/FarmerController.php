@@ -764,12 +764,28 @@ class FarmerController extends Controller
 
         $farmers = $query->orderBy('registration_date', 'desc')->get();
 
+        // Get the authenticated user
+        $user = auth()->user();
+        // Compose display name for footer (full name + position if available)
+        $generatedBy = 'System Administrator';
+        if ($user) {
+            $fullName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+            $position = $user->position ?? null;
+            if ($fullName && $position) {
+                $generatedBy = $fullName . ' (' . $position . ')';
+            } elseif ($fullName) {
+                $generatedBy = $fullName;
+            } elseif (!empty($user->username)) {
+                $generatedBy = $user->username;
+            }
+        }
+
         // Generate filename with timestamp
         $filename = 'farmers_export_' . now()->format('Y-m-d_H-i-s') . '.html';
-        
-        // Return HTML response with download headers (matching legacy SimplePDF)
-        $html = view('farmers.pdf', compact('farmers'))->render();
-        
+
+    // Return HTML response with download headers (matching legacy SimplePDF)
+    $html = view('farmers.pdf', compact('farmers', 'user', 'generatedBy'))->render();
+
         return response($html)
             ->header('Content-Type', 'text/html; charset=utf-8')
             ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')

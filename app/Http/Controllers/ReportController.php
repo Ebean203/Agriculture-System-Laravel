@@ -123,8 +123,31 @@ class ReportController extends Controller
             ->join('barangays as b', 'f.barangay_id', '=', 'b.barangay_id')
             ->leftJoin('farmer_commodities as fc', 'f.farmer_id', '=', 'fc.farmer_id')
             ->leftJoin('commodities as c', 'fc.commodity_id', '=', 'c.commodity_id')
-            ->select('f.*', 'b.barangay_name', 
-                     DB::raw('GROUP_CONCAT(DISTINCT c.commodity_name) as commodities'))
+            ->select(
+                'f.farmer_id',
+                DB::raw('MAX(f.first_name) as first_name'),
+                DB::raw('MAX(f.middle_name) as middle_name'),
+                DB::raw('MAX(f.last_name) as last_name'),
+                DB::raw('MAX(f.suffix) as suffix'),
+                DB::raw('MAX(f.birth_date) as birth_date'),
+                DB::raw('MAX(f.gender) as gender'),
+                DB::raw('MAX(f.contact_number) as contact_number'),
+                DB::raw('MAX(f.barangay_id) as barangay_id'),
+                DB::raw('MAX(f.address_details) as address_details'),
+                DB::raw('MAX(f.is_member_of_4ps) as is_member_of_4ps'),
+                DB::raw('MAX(f.is_ip) as is_ip'),
+                DB::raw('MAX(f.other_income_source) as other_income_source'),
+                DB::raw('MAX(f.land_area_hectares) as land_area_hectares'),
+                DB::raw('MAX(f.registration_date) as registration_date'),
+                DB::raw('MAX(f.archived) as archived'),
+                DB::raw('MAX(f.archive_reason) as archive_reason'),
+                DB::raw('MAX(f.is_rsbsa) as is_rsbsa'),
+                DB::raw('MAX(f.is_ncfrs) as is_ncfrs'),
+                DB::raw('MAX(f.is_boat) as is_boat'),
+                DB::raw('MAX(f.is_fisherfolk) as is_fisherfolk'),
+                DB::raw('MAX(b.barangay_name) as barangay_name'),
+                DB::raw('GROUP_CONCAT(DISTINCT c.commodity_name) as commodities')
+            )
             ->whereBetween('f.registration_date', [$startDate, $endDate])
             ->groupBy('f.farmer_id')
             ->get();
